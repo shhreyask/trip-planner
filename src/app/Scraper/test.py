@@ -14,7 +14,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 import time
 class WebDriver:
 
-  location_data = {}
+  rating=""
 
   def __init__(self):
 
@@ -24,10 +24,9 @@ class WebDriver:
 #   self.options.binary_location = "C:/Program Files (x86)/Google/Chrome/Applic>
     self.options.add_argument("--headless")
     self.driver = webdriver.Chrome(options=self.options)
+    self.rating = "NA"
 
-    self.location_data["rating"] = "NA"
-
-  def get_location_data(self):
+  def get_location_data(self, name, ratings):
 
     try:
       avg_rating = self.driver.find_element(By.CLASS_NAME, "F7nice")
@@ -36,28 +35,43 @@ class WebDriver:
       pass
 
     try:
-      self.location_data["rating"] = avg_rating.text[0:3]
+      ratings[name] = avg_rating.text[0:3]
 
     except:
       pass
       
 
-  def scrape(self, url): # Passed the URL as a variable
+  def scrape(self, url, ratings): # Passed the URL as a variable
     try:
-      self.driver.get(url) # Get is a method that will tell the driver to open at that particular URL
+      for name in url:
+        self.driver.get(url[name]) # Get is a method that will tell the driver to open at that particular URL
+        time.sleep(4)
+        self.get_location_data(name, ratings)
 
     except Exception as e:
       self.driver.quit()
       return
-
-    time.sleep(10) # Waiting for the page to load.
-    self.get_location_data()
-
-    self.driver.quit() # Closing the driver instance.
-
-    return(self.location_data)
+    
+    self.driver.quit()# Closing the driver instance.
   
 
-url = "https://www.google.com/maps/place/Empire+State+Building/@40.7484405,-73.9882393,17z/data=!3m2!4b1!5s0x8b398fecd1aea119:0x76fa1e3ac5a94c70!4m6!3m5!1s0x89c259a9b3117469:0xd134e199a405a163!8m2!3d40.7484405!4d-73.9856644!16zL20vMDJuZF8?entry=ttu"
+def url_maker(name):
+  formatted_name = name.replace(" ", "+")
+  url = f"https://www.google.com/maps/search/{formatted_name}"
+  return url
+
+poi = ["Jehangir Art Gallery", "Empire state Building", "Pvr xperia dombivli"]
+url = {}
+ratings={}
+
+for name in poi:
+  url[name] = url_maker(name)
+
 x = WebDriver()
-print(x.scrape(url))
+x.scrape(url, ratings)
+
+# for i in range(0 , len(poi)):
+#     ratings[poi[i]] = x.scrape(url[poi[i]], ratings)
+
+#print(ratings)
+  
