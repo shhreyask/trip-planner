@@ -14,7 +14,6 @@ class WebDriver:
     self.options.add_argument("--headless")
     self.driver = webdriver.Chrome(options=self.options)
     self.rating = "NA"
-    self.poi = poi
 
   def get_location_data(self, name, ratings):
 
